@@ -55,25 +55,3 @@ import pandas as pd
 
 # Cargar datos
 df = pd.read_csv('empleados.csv')
-
-# CSS para cambiar fondo
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
-        background-size: cover;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.title('Base de Datos de Empleados')
-
-# Buscador por DNI
-dni = st.text_input('Buscar por DNI:')
-
-if dni:
-    resultado = df[df['DNI'] == int(dni)]
-    st.write(resultado)
