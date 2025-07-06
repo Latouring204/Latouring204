@@ -77,11 +77,3 @@ dni = st.text_input('Buscar por DNI:')
 if dni:
     resultado = df[df['DNI'] == int(dni)]
     st.write(resultado)
-else:
-    st.write(df)
-    <style>
-.stApp {
-    background-image: "url(https://www.google.com/search?q=imagen+de+pfa&oq=imagen+de+pfa&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIICAEQABgWGB4yCggCEAAYgAQYogQyCggDEAAYgAQYogQyBwgEEAAY7wUyBwgFEAAY7wXSAQg2Mzg5ajBqN6gCFLACAfEF3dElwStEwzA&client=ms-android-samsung-ss&sourceid=chrome-mobile&ie=UTF-8#vhid=sH-et-wctkp1nM&vssid=_J4xqaIWyJZOf5OUP4qGemQI_50");
-    background-size: cover;
-}
-</style>
