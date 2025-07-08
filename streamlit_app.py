@@ -1,57 +1,46 @@
 import streamlit as st
-import pandas as pd
-import os
+import sqlite3
 
-DATA_FILE = "datos_personales.csv"
+# Conexión a la base de datos
+conn = sqlite3.connect('comisaria.db')
+cursor = conn.cursor()
 
-CAMPOS = [
-    "Nombre y apellido", "Legajo personal", "DNI", "Domicilio", "Teléfono", "Número de obra social",
-    "Situación de revista", "Marca de armamento", "Número de serie del arma", "Número de armamento",
-    "Marca de chaleco balístico", "Modelo del chaleco", "Número de serie del chaleco",
-    "Número de lote de chaleco", "Fecha de fabricación del chaleco",
-    "¿Posee bastón tonfa asignado?", "¿Piloto de lluvia policial asignado?"
-]
+st.title("BASE DE DATOS COMISARÍA TERMINAL DE ÓMNIBUS")
 
-if os.path.exists(DATA_FILE):
-    df = pd.read_csv(DATA_FILE)
-else:
-    df = pd.DataFrame(columns=CAMPOS)
+st.subheader("DATOS PERSONALES")
 
-st.title("🔍 Registro Policial Personalizado")
+dni_input = st.text_input("Ingrese DNI para buscar:")
 
-st.header("Buscar Persona")
-nombre_buscar = st.text_input("Ingresá nombre y apellido")
+if dni_input:
+    cursor.execute("SELECT * FROM Personal WHERE dni=?", (dni_input,))
+    personal = cursor.fetchone()
 
-if nombre_buscar:
-    resultado = df[df["Nombre y apellido"].str.lower() == nombre_buscar.lower()]
-    if not resultado.empty:
-        st.success("Datos encontrados:")
-        st.dataframe(resultado)
+    if personal:
+        st.write(f"**Nombre y Apellido:** {personal[1]}")
+        st.write(f"**Legajo Personal:** {personal[2]}")
+        st.write(f"**Obra Social:** {personal[4]}")
+        st.write(f"**Número de Contacto:** {personal[5]}")
+        st.write(f"**Domicilio:** {personal[6]}")
+
+        st.subheader("ARMAMENTO ASIGNADO")
+        cursor.execute("SELECT * FROM Armamento WHERE id_personal=?", (personal[0],))
+        arma = cursor.fetchone()
+        if arma:
+            st.write(f"**Marca:** {arma[2]}")
+            st.write(f"**Modelo:** {arma[3]}")
+            st.write(f"**N° Serie:** {arma[4]}")
+            st.write(f"**N° Arma:** {arma[5]}")
+        else:
+            st.write("Sin armamento asignado.")
+
+        st.subheader("CHALECO BALÍSTICO")
+        cursor.execute("SELECT * FROM Chaleco_Balistico WHERE id_personal=?", (personal[0],))
+        chaleco = cursor.fetchone()
+        if chaleco:
+            st.write(f"**Marca:** {chaleco[2]}")
+            st.write(f"**Modelo:** {chaleco[3]}")
+            st.write(f"**N° Chaleco:** {chaleco[4]}")
+        else:
+            st.write("Sin chaleco asignado.")
     else:
-        st.warning("No se encontraron registros con ese nombre.")
-
-st.divider()
-
-st.header("Agregar / Editar Persona")
-data = {}
-for campo in CAMPOS:
-    if "¿" in campo:
-        data[campo] = st.selectbox(campo, ["Sí", "No"])
-    elif "Fecha" in campo:
-        data[campo] = st.date_input(campo)
-    else:
-        data[campo] = st.text_input(campo)
-
-if st.button("Guardar Datos"):
-    df = df[df["Nombre y apellido"].str.lower() != data["Nombre y apellido"].lower()]
-    df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
-    df.to_csv(DATA_FILE, index=False)
-    st.success("✅ Datos guardados correctamente")
-
-if st.checkbox("Mostrar todos los registros"):
-    st.dataframe(df)
-    import streamlit as st
-import pandas as pd
-
-# Cargar datos
-df = pd.read_csv('empleados.csv')
+        st.warning("No se encontró personal con ese DNI.")
